@@ -1,0 +1,8 @@
+__pycache__/
+.idea
+.git
+media
+*.sqlite3
+*cookies.json
+backups/
+
