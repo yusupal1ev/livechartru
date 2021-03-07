@@ -20,8 +20,7 @@ class Title(models.Model):
     description_russian = models.TextField(blank=True, null=True)
     spoiler = models.BooleanField()
     image_url = models.CharField(max_length=1024)
-    season = models.CharField(max_length=6)
-    year = models.IntegerField()
+    season = models.ForeignKey('Season', on_delete=models.SET_NULL, blank=True, null=True)
     form = models.CharField(max_length=40)
 
     def __str__(self):
@@ -88,7 +87,7 @@ class Season(models.Model):
 
     @property
     def slug(self):
-        return f"{self.season}-{self.year}"
+        return f"season/{self.season}-{self.year}"
 
     def __str__(self):
         return f"{self.season_russian} {self.year}".capitalize()

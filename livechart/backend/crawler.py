@@ -26,7 +26,11 @@ def crawler(season, year, form):
         title_romaji = article['data-romaji']
         premiere = int(article['data-premiere'])
         premiere_precision = int(article['data-premiere-precision'])
-        categories = [i.find('a').string.strip() for i in article.find('ol', class_='anime-tags')('li')]
+
+        try:
+            categories = [i.find('a').string.strip() for i in article.find('ol', class_='anime-tags')('li')]
+        except AttributeError:
+            categories = []
 
         try:
             studios = [i.find('a').string.strip() for i in article.find('ul', class_='anime-studios')('li')]
