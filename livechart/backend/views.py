@@ -12,25 +12,27 @@ class HomeView(View):
     def post(self, request, *args, **kwargs):
         titles = crawler('winter', '2021', 'tv')
         for title in titles:
-            # for key, value in title.items():
-            #     print(key, ': ', value, '|', type(value))
-
+            # Добавить get_or_update, чтобы обновлять записи
             defaults = {**title}
             del defaults["data_id"]
             del defaults["categories"]
             del defaults["studios"]
-            ttl, created = Title.objects.get_or_create(data_id=title['data_id'], defaults={**defaults})
+            title_model, created = Title.objects.get_or_create(data_id=title['data_id'], defaults={**defaults})
 
             if created:
-                for category in title["categories"]:
-                    ctg, created = Category.objects.get_or_create(name=category)
-                    ttl.categories.add(ctg)
-
-                for studio in title["studios"]:
-                    std, created = Studio.objects.get_or_create(name=studio)
-                    ttl.studios.add(std)
+                self.create_and_fill_category_and_studio(title_model, title)
 
         return redirect('main', permanent=True)
+
+    @staticmethod
+    def create_and_fill_category_and_studio(title_model, title):
+        for category_name in title["categories"]:
+            category, created = Category.objects.get_or_create(name=category_name)
+            title_model.categories.add(category)
+
+        for studio_name in title["studios"]:
+            studio, created = Studio.objects.get_or_create(name=studio_name)
+            title_model.studios.add(studio)
 
 
 class RefreshView(View):
