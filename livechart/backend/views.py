@@ -7,13 +7,20 @@ from .models import Title, Category, Studio, Season
 
 class HomeView(View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'base.html')
+        seasons = Season.objects.all()
+
+        context = {"seasons": seasons}
+        return render(request, 'base.html', context=context)
 
     def post(self, request, *args, **kwargs):
         titles, seasons = crawler('winter', '2021', 'tv')
 
         for season in seasons:
-            Season.objects.get_or_create(season=season["season"], year=season["year"])
+            Season.objects.get_or_create(season=season["season"],
+                                         year=season["year"],
+                                         month_started=season["month_started"],
+                                         month_ended=season["month_ended"],
+                                         )
 
         for title in titles:
             defaults = {**title}

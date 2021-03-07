@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 
 
@@ -67,12 +69,26 @@ class Studio(models.Model):
 
 class Season(models.Model):
     season = models.CharField(max_length=6)
-    year = models.CharField(max_length=4)
+    year = models.IntegerField()
+    month_started = models.IntegerField()
+    month_ended = models.IntegerField()
 
     @property
     def season_russian(self):
         translates = {"spring": "весна", "summer": "лето", "fall": "осень", "winter": "зима"}
         return translates[self.season]
+
+    @property
+    def season_start_date(self):
+        return datetime.datetime(self.year, self.month_started, 1)
+
+    @property
+    def season_end_date(self):
+        return datetime.datetime(self.year, self.month_started + 3, 1)
+
+    @property
+    def slug(self):
+        return f"{self.season}-{self.year}"
 
     def __str__(self):
         return f"{self.season_russian} {self.year}".capitalize()
@@ -81,3 +97,4 @@ class Season(models.Model):
         verbose_name = "Сезон"
         verbose_name_plural = "Сезоны"
         unique_together = ('season', 'year')
+        ordering = ('-year', '-month_started')

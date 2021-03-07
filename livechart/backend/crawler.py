@@ -127,15 +127,19 @@ def get_html_from_backup(season, year, form):
 
 
 def get_seasons(soup: BeautifulSoup):
+    months = {"spring": 4, "summer": 7, "fall": 10, "winter": 1}
     seasons = []
     cells = soup.find('li', class_='has-browse-menu').find('div', class_='small-up-4').find_all('div', class_='cell')
     for cell in cells:
         cell: BeautifulSoup
         text = cell.find('a').text.strip()
         if text != 'More':
+            season = text.split(' ')[0].lower()
             seasons.append({
-                "season": text.split(' ')[0].lower(),
-                "year": text.split(' ')[1],
+                "season": season,
+                "year": int(text.split(' ')[1]),
+                "month_started": months[season],
+                "month_ended": months[season] + 2,
             })
 
     return seasons
