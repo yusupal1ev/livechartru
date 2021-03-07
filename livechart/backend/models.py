@@ -63,3 +63,21 @@ class Studio(models.Model):
     class Meta:
         verbose_name = "Студия"
         verbose_name_plural = "Студии"
+
+
+class Season(models.Model):
+    season = models.CharField(max_length=6)
+    year = models.CharField(max_length=4)
+
+    @property
+    def season_russian(self):
+        translates = {"spring": "весна", "summer": "лето", "fall": "осень", "winter": "зима"}
+        return translates[self.season]
+
+    def __str__(self):
+        return f"{self.season_russian} {self.year}".capitalize()
+
+    class Meta:
+        verbose_name = "Сезон"
+        verbose_name_plural = "Сезоны"
+        unique_together = ('season', 'year')

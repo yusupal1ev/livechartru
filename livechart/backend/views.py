@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views.generic import View, TemplateView
 
 from .crawler import crawler
-from .models import Title, Category, Studio
+from .models import Title, Category, Studio, Season
 
 
 class HomeView(View):
@@ -10,9 +10,12 @@ class HomeView(View):
         return render(request, 'base.html')
 
     def post(self, request, *args, **kwargs):
-        titles = crawler('winter', '2021', 'tv')
+        titles, seasons = crawler('winter', '2021', 'tv')
+
+        for season in seasons:
+            Season.objects.get_or_create(season=season["season"], year=season["year"])
+
         for title in titles:
-            # Добавить get_or_update, чтобы обновлять записи
             defaults = {**title}
             del defaults["data_id"]
             del defaults["categories"]

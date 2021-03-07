@@ -17,6 +17,7 @@ def crawler(season, year, form):
         html = get_html_from_backup(season, year, form)
 
     soup = BeautifulSoup(html, 'lxml')
+    seasons = get_seasons(soup)
     titles = []
     for article in soup('article', class_='anime'):
         data_id = int(article['data-anime-id'])
@@ -84,7 +85,7 @@ def crawler(season, year, form):
                        "form": form,
                        }
                       )
-    return titles
+    return titles, seasons
 
 
 def get_html_through_selenium(season, year, form):
@@ -123,3 +124,18 @@ def get_html_from_backup(season, year, form):
     with open(os.path.join(settings.BASE_DIR, f'backend/backups/{season}-{year}-{form}.html'), 'r') as f:
         html = f.read()
         return html
+
+
+def get_seasons(soup: BeautifulSoup):
+    seasons = []
+    cells = soup.find('li', class_='has-browse-menu').find('div', class_='small-up-4').find_all('div', class_='cell')
+    for cell in cells:
+        cell: BeautifulSoup
+        text = cell.find('a').text.strip()
+        if text != 'More':
+            seasons.append({
+                "season": text.split(' ')[0].lower(),
+                "year": text.split(' ')[1],
+            })
+
+    return seasons
