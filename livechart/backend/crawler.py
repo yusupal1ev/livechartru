@@ -79,6 +79,9 @@ def crawler(season, year, form):
                        "description": description,
                        "spoiler": spoiler,
                        "image_url": image_url,
+                       "season": season,
+                       "year": year,
+                       "form": form,
                        }
                       )
     return titles
@@ -112,7 +115,7 @@ def get_html_through_selenium(season, year, form):
 
 
 def create_html_backup(season, year, form, html):
-    with open(os.path.join(settings.BASE_DIR, f'backend/{season}-{year}-{form}.html'), 'w') as f:
+    with open(os.path.join(settings.BASE_DIR, f'backend/backups/{season}-{year}-{form}.html'), 'w') as f:
         f.write(html)
 
 

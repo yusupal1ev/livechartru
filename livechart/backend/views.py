@@ -17,7 +17,7 @@ class HomeView(View):
             del defaults["data_id"]
             del defaults["categories"]
             del defaults["studios"]
-            title_model, created = Title.objects.get_or_create(data_id=title['data_id'], defaults={**defaults})
+            title_model, created = Title.objects.update_or_create(data_id=title['data_id'], defaults={**defaults})
 
             if created:
                 self.create_and_fill_category_and_studio(title_model, title)
@@ -35,5 +35,9 @@ class HomeView(View):
             title_model.studios.add(studio)
 
 
-class RefreshView(View):
-    pass
+class SeasonView(TemplateView):
+    def get(self, request, *args, **kwargs):
+        season = kwargs['season']
+        year = kwargs['year']
+        context = {'season': f"{season}-{year}"}
+        return render(request, 'season.html', context=context)

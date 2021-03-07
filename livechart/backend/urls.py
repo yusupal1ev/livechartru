@@ -1,8 +1,8 @@
 from django.urls import path
-from .views import HomeView, RefreshView
+from .views import HomeView, SeasonView
 
 
 urlpatterns = [
     path('', HomeView.as_view(), name='main'),
-    path('refresh/', RefreshView.as_view(), name='refresh'),
+    path('season/<str:season>-<int:year>', SeasonView.as_view(), name='season'),
 ]
