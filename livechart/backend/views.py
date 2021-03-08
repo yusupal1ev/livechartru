@@ -1,6 +1,7 @@
+from django.http import Http404
 from django.shortcuts import render, redirect, get_list_or_404
 from django.utils.text import slugify
-from django.views.generic import View, TemplateView, ListView
+from django.views.generic import View, TemplateView, ListView, DetailView
 
 from .crawler import crawler
 from .models import Title, Category, Studio, Season
@@ -68,5 +69,19 @@ class SeasonView(ListView):
         year = self.kwargs['year']
         context["current_season"] = f"{season}-{year}"
         context["seasons"] = seasons
-        print(context)
         return context
+
+
+class AnimeView(DetailView):
+    model = Title
+    context_object_name = 'anime'
+    template_name = 'title.html'
+    pk_url_kwarg = 'data_id'
+
+    def get_object(self, queryset=None):
+        data_id = self.kwargs.get(self.pk_url_kwarg, None)
+        try:
+            anime = self.model.objects.get(data_id=data_id)
+        except:
+            raise Http404()
+        return anime

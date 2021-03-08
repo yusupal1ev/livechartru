@@ -4,7 +4,7 @@ from django.db import models
 
 
 class Title(models.Model):
-    data_id = models.IntegerField()
+    data_id = models.IntegerField(unique=True)
     title_english = models.CharField(max_length=255)
     title_native = models.CharField(max_length=255)
     title_romaji = models.CharField(max_length=255)

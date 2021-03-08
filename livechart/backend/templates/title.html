@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <img src="{{ anime.image_url }}" height="350" width="245" alt="...">
+            </div>
+            <div class="col-md-9">
+                <h3>{{ anime.title_romaji }}</h3>
+                {% if anime.title_russian %}
+                    <h4>{{ anime.title_russian }}</h4>
+                {% else %}
+                    <h4>{{ anime.title_english }}</h4>
+                {% endif %}
+            <div class="border border-primary p-3">
+                <div class="row">
+                    <div class="col md-3 d-flex justify-content-center">
+                        Формат
+                    </div>
+                    <div class="col md-3 d-flex justify-content-center">
+                        Источник
+                    </div>
+                    <div class="col md-3 d-flex justify-content-center">
+                        Эпизоды
+                    </div>
+                    <div class="col md-3 d-flex justify-content-center">
+                        Длительность
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col md-3 d-flex justify-content-center">
+                        <p>{{ anime.form }}</p>
+                    </div>
+                    <div class="col md-3 d-flex justify-content-center">
+                        <p>{{ anime.source }}</p>
+                    </div>
+                    <div class="col md-3 d-flex justify-content-center">
+                        <p>{{ anime.episodes }}</p>
+                    </div>
+                    <div class="col md-3 d-flex justify-content-center">
+                        <p>{{ anime.duration }}</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col md-12">
+                        {{ anime.description }}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col md-6">
+                        {% for category in anime.categories.all %}
+                            <a href="/category/{{ category.slug }}">{{ category }}</a>
+                        {% endfor %}
+                    </div>
+                    <div class="col md-6">
+                        {% for studio in anime.studios.all %}
+                            <a href="/studio/{{ studio.slug }}">{{ studio }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
