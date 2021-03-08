@@ -66,7 +66,7 @@ def crawler(season, year, form):
         else:
             spoiler = False
 
-        image_url = article.find('img', class_='lazy-img')['src']
+        image_url = article.find('img', class_='lazy-img')['data-srcset'].split(' ')[-2]
 
         titles.append({"data_id": data_id,
                        "title_english": title_english,

@@ -42,6 +42,7 @@ class Category(models.Model):
     name = models.CharField(max_length=255)
     name_russian = models.CharField(max_length=255, blank=True, null=True)
     titles = models.ManyToManyField(Title, related_name='categories')
+    slug = models.SlugField(unique=True, null=True)
 
     def __str__(self):
         if self.name_russian:
@@ -57,6 +58,7 @@ class Category(models.Model):
 class Studio(models.Model):
     name = models.CharField(max_length=255)
     titles = models.ManyToManyField(Title, related_name='studios')
+    slug = models.SlugField(unique=True, null=True)
 
     def __str__(self):
         return self.name
@@ -87,7 +89,7 @@ class Season(models.Model):
 
     @property
     def slug(self):
-        return f"season/{self.season}-{self.year}"
+        return f"/season/{self.season}-{self.year}"
 
     def __str__(self):
         return f"{self.season_russian} {self.year}".capitalize()

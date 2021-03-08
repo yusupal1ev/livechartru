@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_list_or_404
+from django.utils.text import slugify
 from django.views.generic import View, TemplateView, ListView
 
 from .crawler import crawler
@@ -8,7 +9,6 @@ from .models import Title, Category, Studio, Season
 class HomeView(TemplateView):
     def get(self, request, *args, **kwargs):
         seasons = Season.objects.all()
-
         context = {"seasons": seasons}
         return render(request, 'base.html', context=context)
 
@@ -18,7 +18,7 @@ class CrawlerView(TemplateView):
         return render(request, 'crawler.html')
 
     def post(self, request, *args, **kwargs):
-        titles, seasons = crawler('winter', '2021', 'tv')
+        titles, seasons = crawler('spring', '2021', 'tv')
 
         for season in seasons:
             Season.objects.get_or_create(season=season["season"],
@@ -39,25 +39,34 @@ class CrawlerView(TemplateView):
             if created:
                 self.create_and_fill_category_and_studio(title_model, title)
 
-        return redirect('main', permanent=True)
+        return redirect('crawler', permanent=True)
 
     @staticmethod
     def create_and_fill_category_and_studio(title_model, title):
         for category_name in title["categories"]:
-            category, created = Category.objects.get_or_create(name=category_name)
+            category, created = Category.objects.get_or_create(name=category_name, slug=slugify(category_name))
             title_model.categories.add(category)
 
         for studio_name in title["studios"]:
-            studio, created = Studio.objects.get_or_create(name=studio_name)
+            studio, created = Studio.objects.get_or_create(name=studio_name, slug=slugify(studio_name))
             title_model.studios.add(studio)
 
 
 class SeasonView(ListView):
-    model = Title
     template_name = 'season.html'
+    context_object_name = 'titles'
+
+    def get_queryset(self):
+        season = Season.objects.get(season=self.kwargs['season'], year=self.kwargs['year'])
+        titles = get_list_or_404(Title, season=season)
+        return titles
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data()
+        context = super().get_context_data(**kwargs)
+        seasons = Season.objects.all()
         season = self.kwargs['season']
         year = self.kwargs['year']
-        context["season"] = f"{season}-{year}"
+        context["current_season"] = f"{season}-{year}"
+        context["seasons"] = seasons
+        print(context)
+        return context
