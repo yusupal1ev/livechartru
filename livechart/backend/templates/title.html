@@ -1,5 +1,13 @@
 {% extends 'base.html' %}
 
+{% block title %}
+    {% if title.title_russian %}
+        {{ title.title_russian }}
+    {% else %}
+        {{ title.title_english }}
+    {% endif %} |
+{% endblock title %}
+
 {% block content %}
     <div class="container">
         <div class="row">

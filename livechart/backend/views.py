@@ -1,5 +1,5 @@
 from django.http import Http404
-from django.shortcuts import render, redirect, get_list_or_404
+from django.shortcuts import render, redirect, get_list_or_404, get_object_or_404
 from django.utils.text import slugify
 from django.views.generic import View, TemplateView, ListView, DetailView
 
@@ -54,7 +54,7 @@ class CrawlerView(TemplateView):
 
 
 class SeasonView(ListView):
-    template_name = 'season.html'
+    template_name = 'title_list.html'
     context_object_name = 'titles'
 
     def get_queryset(self):
@@ -67,8 +67,42 @@ class SeasonView(ListView):
         seasons = Season.objects.all()
         season = self.kwargs['season']
         year = self.kwargs['year']
-        context["current_season"] = f"{season}-{year}"
+        context["head"] = f"{season}-{year}"
         context["seasons"] = seasons
+        return context
+
+
+class CategoryView(ListView):
+    template_name = 'title_list.html'
+    context_object_name = 'titles'
+
+    def get_queryset(self):
+        category = get_object_or_404(Category, slug=self.kwargs['category'])
+        titles = get_list_or_404(Title, categories=category)
+        return titles
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        seasons = Season.objects.all()
+        context["seasons"] = seasons
+        context["head"] = self.kwargs["category"]
+        return context
+
+
+class StudioView(ListView):
+    template_name = 'title_list.html'
+    context_object_name = 'titles'
+
+    def get_queryset(self):
+        studio = get_object_or_404(Studio, slug=self.kwargs['studio'])
+        titles = get_list_or_404(Title, studios=studio)
+        return titles
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        seasons = Season.objects.all()
+        context["seasons"] = seasons
+        context["head"] = self.kwargs["studio"]
         return context
 
 
@@ -85,3 +119,9 @@ class TitleView(DetailView):
         except:
             raise Http404()
         return anime
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        seasons = Season.objects.all()
+        context["seasons"] = seasons
+        return context
