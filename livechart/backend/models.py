@@ -1,6 +1,7 @@
 import datetime
 
 from django.db import models
+from django.urls import reverse
 
 
 class Title(models.Model):
@@ -22,6 +23,9 @@ class Title(models.Model):
     image_url = models.CharField(max_length=1024)
     season = models.ForeignKey('Season', on_delete=models.SET_NULL, blank=True, null=True)
     form = models.CharField(max_length=40)
+
+    def get_absolute_url(self):
+        return reverse('title', args=(self.data_id, ))
 
     def __str__(self):
         if self.title_russian:

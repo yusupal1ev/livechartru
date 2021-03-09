@@ -72,9 +72,9 @@ class SeasonView(ListView):
         return context
 
 
-class AnimeView(DetailView):
+class TitleView(DetailView):
     model = Title
-    context_object_name = 'anime'
+    context_object_name = 'title'
     template_name = 'title.html'
     pk_url_kwarg = 'data_id'
 

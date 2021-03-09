@@ -9,7 +9,7 @@
                 <div class="col mb-4">
                     <div class="card h-100">
                         <div class="card-header">
-                            <a href="#"><small><strong class="card-title d-flex align-items-center justify-content-center" style="height:35px;">{{ title }}</strong></small></a>
+                            <a href="{{ title.get_absolute_url }}"><small><strong class="card-title d-flex align-items-center justify-content-center" style="height:35px;">{{ title }}</strong></small></a>
                         </div>
                         <img src="{{ title.image_url }}" alt="...">
                         <div class="card-footer align-items-center justify-content-center">

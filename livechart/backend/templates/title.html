@@ -4,14 +4,14 @@
     <div class="container">
         <div class="row">
             <div class="col-md-3">
-                <img src="{{ anime.image_url }}" height="350" width="245" alt="...">
+                <img src="{{ title.image_url }}" height="350" width="245" alt="...">
             </div>
             <div class="col-md-9">
-                <h3>{{ anime.title_romaji }}</h3>
-                {% if anime.title_russian %}
-                    <h4>{{ anime.title_russian }}</h4>
+                <h3>{{ title.title_romaji }}</h3>
+                {% if title.title_russian %}
+                    <h4>{{ title.title_russian }}</h4>
                 {% else %}
-                    <h4>{{ anime.title_english }}</h4>
+                    <h4>{{ title.title_english }}</h4>
                 {% endif %}
             <div class="border border-primary p-3">
                 <div class="row">
@@ -30,33 +30,33 @@
                 </div>
                 <div class="row">
                     <div class="col md-3 d-flex justify-content-center">
-                        <p>{{ anime.form }}</p>
+                        <p>{{ title.form }}</p>
                     </div>
                     <div class="col md-3 d-flex justify-content-center">
-                        <p>{{ anime.source }}</p>
+                        <p>{{ title.source }}</p>
                     </div>
                     <div class="col md-3 d-flex justify-content-center">
-                        <p>{{ anime.episodes }}</p>
+                        <p>{{ title.episodes }}</p>
                     </div>
                     <div class="col md-3 d-flex justify-content-center">
-                        <p>{{ anime.duration }}</p>
+                        <p>{{ title.duration }}</p>
                     </div>
                 </div>
                 <hr>
                 <div class="row">
                     <div class="col md-12">
-                        {{ anime.description }}
+                        {{ title.description }}
                     </div>
                 </div>
                 <hr>
                 <div class="row">
                     <div class="col md-6">
-                        {% for category in anime.categories.all %}
+                        {% for category in title.categories.all %}
                             <a href="/category/{{ category.slug }}">{{ category }}</a>
                         {% endfor %}
                     </div>
                     <div class="col md-6">
-                        {% for studio in anime.studios.all %}
+                        {% for studio in title.studios.all %}
                             <a href="/studio/{{ studio.slug }}">{{ studio }}</a>
                         {% endfor %}
                     </div>
