@@ -58,6 +58,7 @@ class SeasonView(ListView):
     template_name = 'title_list.html'
     context_object_name = 'titles'
     paginate_by = 20
+    paginate_orphans = 4
 
     def get_queryset(self):
         season = Season.objects.get(season=self.kwargs['season'], year=self.kwargs['year'])
