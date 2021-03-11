@@ -9,7 +9,6 @@
 {% endblock title %}
 
 {% block content %}
-    <div class="container">
         <div class="row">
             <div class="col-md-3">
                 <img src="{{ title.image_url }}" height="350" width="245" alt="...">
@@ -60,17 +59,16 @@
                 <div class="row">
                     <div class="col md-6">
                         {% for category in title.categories.all %}
-                            <a href="/category/{{ category.slug }}">{{ category }}</a>
+                            <a href="{{ category.get_absolute_url }}">{{ category }}</a>
                         {% endfor %}
                     </div>
                     <div class="col md-6">
                         {% for studio in title.studios.all %}
-                            <a href="/studio/{{ studio.slug }}">{{ studio }}</a>
+                            <a href="{{ studio.get_absolute_url }}">{{ studio }}</a>
                         {% endfor %}
                     </div>
                 </div>
             </div>
             </div>
-        </div>
     </div>
 {% endblock content %}

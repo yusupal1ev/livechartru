@@ -48,6 +48,9 @@ class Category(models.Model):
     titles = models.ManyToManyField(Title, related_name='categories')
     slug = models.SlugField(unique=True, null=True)
 
+    def get_absolute_url(self):
+        return reverse('category', args=(self.slug, ))
+
     def __str__(self):
         if self.name_russian:
             return self.name_russian
@@ -64,6 +67,9 @@ class Studio(models.Model):
     titles = models.ManyToManyField(Title, related_name='studios')
     slug = models.SlugField(unique=True, null=True)
 
+    def get_absolute_url(self):
+        return reverse('studio', args=(self.slug, ))
+
     def __str__(self):
         return self.name
 
@@ -78,6 +84,9 @@ class Season(models.Model):
     month_started = models.IntegerField()
     month_ended = models.IntegerField()
 
+    def get_absolute_url(self):
+        return reverse('season', args=(self.season, self.year))
+
     @property
     def season_russian(self):
         translates = {"spring": "весна", "summer": "лето", "fall": "осень", "winter": "зима"}
@@ -89,11 +98,14 @@ class Season(models.Model):
 
     @property
     def season_end_date(self):
-        return datetime.datetime(self.year, self.month_started + 3, 1)
+        try:
+            return datetime.datetime(self.year, self.month_started + 3, 1)
+        except ValueError:
+            return datetime.datetime(self.year + 1, 1, 1)
 
     @property
     def slug(self):
-        return f"/season/{self.season}-{self.year}"
+        return f"{self.season}-{self.year}"
 
     def __str__(self):
         return f"{self.season_russian} {self.year}".capitalize()

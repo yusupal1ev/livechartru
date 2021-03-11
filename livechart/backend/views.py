@@ -1,17 +1,18 @@
 from django.http import Http404
 from django.shortcuts import render, redirect, get_list_or_404, get_object_or_404
 from django.utils.text import slugify
-from django.views.generic import View, TemplateView, ListView, DetailView
+from django.views.generic import TemplateView, ListView, DetailView
 
 from .crawler import crawler
 from .models import Title, Category, Studio, Season
+from .utils import get_current_season
 
 
 class HomeView(TemplateView):
     def get(self, request, *args, **kwargs):
         seasons = Season.objects.all()
-        context = {"seasons": seasons}
-        return render(request, 'base.html', context=context)
+        current_season = get_current_season(seasons=seasons)
+        return redirect(current_season, permanent=True)
 
 
 class CrawlerView(TemplateView):
@@ -56,6 +57,7 @@ class CrawlerView(TemplateView):
 class SeasonView(ListView):
     template_name = 'title_list.html'
     context_object_name = 'titles'
+    paginate_by = 20
 
     def get_queryset(self):
         season = Season.objects.get(season=self.kwargs['season'], year=self.kwargs['year'])
@@ -65,9 +67,8 @@ class SeasonView(ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         seasons = Season.objects.all()
-        season = self.kwargs['season']
-        year = self.kwargs['year']
-        context["head"] = f"{season}-{year}"
+        season = seasons.get(season=self.kwargs['season'], year=self.kwargs['year'])
+        context["head"] = str(season)
         context["seasons"] = seasons
         return context
 
@@ -75,6 +76,7 @@ class SeasonView(ListView):
 class CategoryView(ListView):
     template_name = 'title_list.html'
     context_object_name = 'titles'
+    paginate_by = 20
 
     def get_queryset(self):
         category = get_object_or_404(Category, slug=self.kwargs['category'])
@@ -92,6 +94,7 @@ class CategoryView(ListView):
 class StudioView(ListView):
     template_name = 'title_list.html'
     context_object_name = 'titles'
+    paginate_by = 20
 
     def get_queryset(self):
         studio = get_object_or_404(Studio, slug=self.kwargs['studio'])
