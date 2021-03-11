@@ -3,15 +3,26 @@
 {% block title %}
     {% if title.title_russian %}
         {{ title.title_russian }}
-    {% else %}
+    {% elif title.title_english %}
         {{ title.title_english }}
+    {% else %}
+        {{ title.title_romaji }}
     {% endif %} |
 {% endblock title %}
 
 {% block content %}
     <div class="row">
         <div class="col-md-3">
+
             <img src="{{ title.image_url }}" height="350" width="245" alt="...">
+            <br>
+            <br>
+                <div class="row justify-content-center">
+            <small>Рейтинг</small>
+                </div>
+                    <div class="row justify-content-center">
+            <h1 class="border border-primary pl-3 pr-3"><strong>{{ title.rating }}</strong></h1>
+                </div>
         </div>
         <div class="col-md-9">
             <h3>{{ title.title_romaji }}</h3>
