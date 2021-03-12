@@ -78,6 +78,7 @@ class CategoryView(ListView):
     template_name = 'title_list.html'
     context_object_name = 'titles'
     paginate_by = 20
+    paginate_orphans = 4
 
     def get_queryset(self):
         category = get_object_or_404(Category, slug=self.kwargs['category'])
@@ -96,6 +97,7 @@ class StudioView(ListView):
     template_name = 'title_list.html'
     context_object_name = 'titles'
     paginate_by = 20
+    paginate_orphans = 4
 
     def get_queryset(self):
         studio = get_object_or_404(Studio, slug=self.kwargs['studio'])
