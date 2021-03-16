@@ -59,10 +59,16 @@ class SeasonView(ListView):
     context_object_name = 'titles'
     paginate_by = 20
     paginate_orphans = 4
+    ordering = '-rating'
 
     def get_queryset(self):
+        if self.request.GET.get('order_by'):
+            self.ordering = self.request.GET["order_by"]
+
         season = Season.objects.get(season=self.kwargs['season'], year=self.kwargs['year'])
-        titles = get_list_or_404(Title, season=season)
+        titles = Title.objects.filter(season=season).order_by(self.ordering)
+        if not titles:
+            raise Http404("There are not titles in this season")
         return titles
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -71,6 +77,24 @@ class SeasonView(ListView):
         season = seasons.get(season=self.kwargs['season'], year=self.kwargs['year'])
         context["head"] = str(season)
         context["seasons"] = seasons
+
+        page = bool(self.request.GET.get("page"))
+        context["page"] = page
+
+        if self.request.GET.get('order_by'):
+            context["order_by"] = "order_by=" + self.request.GET["order_by"] + "&"
+        else:
+            context["order_by"] = ""
+
+        choices = [
+            ('rating', 'по рейтингу'),
+            ('title_russian', 'по русскому названию'),
+            ('title_english', 'по английскому названию'),
+            ('title_romaji', 'по японскому названию')
+        ]
+        context["choices"] = choices
+        context["ordering"] = self.get_ordering()
+
         return context
 
 

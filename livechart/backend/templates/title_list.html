@@ -3,6 +3,17 @@
 {% block title %}{{ head }} | {% endblock title %}
 
 {% block content %}
+    <div class="row">
+    {{ ordering }}
+    </div>
+    <div class="row">
+        <label for="sort_select">Сортировка: </label>
+        <select id="sort_select">
+            {% for choice in choices %}
+                <option class="select_option" data-option="{{ choice.0 }}" {% if choice.0 == ordering or choice.0 == ordering|slice:"1:" %}selected{% endif %}>{{ choice.1 }}</option>
+            {% endfor %}
+        </select>
+    </div>
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4">
         {% for title in titles %}
             <div class="col mb-4">
@@ -10,7 +21,7 @@
                     <div class="card-header">
                         <a href="{{ title.get_absolute_url }}"><small><strong class="card-title d-flex align-items-center justify-content-center">{{ title }}</strong></small></a>
                     </div>
-                    <img src="{{ title.image_url }}" alt="...">
+                    <img class="img_card" src="{{ title.image_url }}" alt="...">
                     <div class="card-footer align-items-center justify-content-center">
                         {% for category in title.categories.all %}
                             <a href="{{ category.get_absolute_url }}"><small>{{ category }}</small> </a>
@@ -25,19 +36,39 @@
     <nav aria-label="Search results pages">
         <ul class="pagination justify-content-center">
             {% if page_obj.has_previous %}
-                <li class="page-item mr-2"><a class="page-link" href="?page=1"><<</a></li>
-                <li class="page-item mr-2"><a class="page-link" href="?page={{ page_obj.previous_page_number }}"><</a></li>
-                <li class="page-item mr-2"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a></li>
+                <li class="page-item mr-2"><a class="page-link" href="?{{ order_by }}page=1"><<</a></li>
+                <li class="page-item mr-2"><a class="page-link" href="?{{ order_by }}page={{ page_obj.previous_page_number }}"><</a></li>
+                <li class="page-item mr-2"><a class="page-link" href="?{{ order_by }}page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a></li>
             {% endif %}
 
                 <li class="page-item disabled mr-2"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
 
             {% if page_obj.has_next %}
-                <li class="page-item mr-2"><a class="page-link" href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a></li>
-                <li class="page-item mr-2"><a class="page-link" href="?page={{ page_obj.next_page_number }}">></a></li>
-                <li class="page-item mr-2"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">>></a></li>
+                <li class="page-item mr-2"><a class="page-link" href="?{{ order_by }}page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a></li>
+                <li class="page-item mr-2"><a class="page-link" href="?{{ order_by }}page={{ page_obj.next_page_number }}">></a></li>
+                <li class="page-item mr-2"><a class="page-link" href="?{{ order_by }}page={{ page_obj.paginator.num_pages }}">>></a></li>
             {% endif %}
         </ul>
     </nav>
     {% endif %}
+
+    <script type="text/javascript">
+
+        var options = document.getElementsByClassName('select_option')
+        var page = '{{ page }}'
+        var page_number = {{ page_obj.number }}
+
+        for (var i = 0; i < options.length; i++){
+            options[i].addEventListener('click', function (){
+                var order_by = this.dataset.option
+                var url = "?order_by=" + order_by
+
+                if(page === 'True'){
+                    url += "&page=" + page_number
+                }
+                window.location.href = url
+            })
+        }
+
+    </script>
 {% endblock content %}
