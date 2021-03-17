@@ -4,7 +4,7 @@ from django.db import models
 from django.urls import reverse
 
 
-class Title(models.Model):
+class Anime(models.Model):
     data_id = models.IntegerField(unique=True)
     title_english = models.CharField(max_length=255)
     title_native = models.CharField(max_length=255)
@@ -25,7 +25,7 @@ class Title(models.Model):
     form = models.CharField(max_length=40)
 
     def get_absolute_url(self):
-        return reverse('title', args=(self.data_id, ))
+        return reverse('anime', args=(self.data_id, ))
 
     def __str__(self):
         if self.title_russian:
@@ -38,14 +38,14 @@ class Title(models.Model):
             return self.title_native
 
     class Meta:
-        verbose_name = "Тайтл"
-        verbose_name_plural = "Тайтлы"
+        verbose_name = "Аниме"
+        verbose_name_plural = "Аниме"
 
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
     name_russian = models.CharField(max_length=255, blank=True, null=True)
-    titles = models.ManyToManyField(Title, related_name='categories')
+    anime_list = models.ManyToManyField(Anime, related_name='categories')
     slug = models.SlugField(unique=True, null=True)
 
     def get_absolute_url(self):
@@ -64,7 +64,7 @@ class Category(models.Model):
 
 class Studio(models.Model):
     name = models.CharField(max_length=255)
-    titles = models.ManyToManyField(Title, related_name='studios')
+    anime_list = models.ManyToManyField(Anime, related_name='studios')
     slug = models.SlugField(unique=True, null=True)
 
     def get_absolute_url(self):

@@ -1,30 +1,39 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ head }} | {% endblock title %}
+{% block title %}{% endblock title %}
 
 {% block content %}
-    <div class="row">
-    {{ ordering }}
+    <div class="row ml-1">
+    {% block header %}
+
+    {% endblock header %}
     </div>
-    <div class="row">
-        <label for="sort_select">Сортировка: </label>
+    <hr>
+
+    <div class="row ml-1">
+        <label for="sort_select">Сортировка:</label>
         <select id="sort_select">
             {% for choice in choices %}
-                <option class="select_option" data-option="{{ choice.0 }}" {% if choice.0 == ordering or choice.0 == ordering|slice:"1:" %}selected{% endif %}>{{ choice.1 }}</option>
+                <option class="select_option" data-option="{{ choice.0 }}" {% if choice.0 == ordering %}selected{% endif %}>{{ choice.1 }}</option>
             {% endfor %}
         </select>
     </div>
+    <br>
+
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4">
-        {% for title in titles %}
+        {% for anime in anime_list %}
             <div class="col mb-4">
                 <div class="card h-100">
-                    <div class="card-header">
-                        <a href="{{ title.get_absolute_url }}"><small><strong class="card-title d-flex align-items-center justify-content-center">{{ title }}</strong></small></a>
+                    <div class="card-header text-center">
+                        <a href="{{ anime.get_absolute_url }}"><strong class="card-title">{{ anime }}</strong></a>
                     </div>
-                    <img class="img_card" src="{{ title.image_url }}" alt="...">
-                    <div class="card-footer align-items-center justify-content-center">
-                        {% for category in title.categories.all %}
-                            <a href="{{ category.get_absolute_url }}"><small>{{ category }}</small> </a>
+                    <div class="card-body">
+                        <img class="card-image" src="{{ anime.image_url }}" alt="...">
+                        <h1 id="rating">{{ anime.rating }}</h1>
+                    </div>
+                    <div class="card-footer text-center">
+                        {% for category in anime.categories.all %}
+                            <a href="{{ category.get_absolute_url }}"><span class="category">{{ category }}</span></a>
                         {% endfor %}
                     </div>
                 </div>

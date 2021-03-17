@@ -1,11 +1,11 @@
 from django.http import Http404
-from django.shortcuts import render, redirect, get_list_or_404, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.text import slugify
 from django.views.generic import TemplateView, ListView, DetailView
 
 from .crawler import crawler
-from .models import Title, Category, Studio, Season
-from .utils import get_current_season
+from .models import Anime, Category, Studio, Season
+from .utils import CHOICES, get_current_season
 
 
 class HomeView(TemplateView):
@@ -20,7 +20,7 @@ class CrawlerView(TemplateView):
         return render(request, 'crawler.html')
 
     def post(self, request, *args, **kwargs):
-        titles, seasons = crawler('spring', '2021', 'tv')
+        titles, seasons = crawler('summer', '2021', 'tv')
 
         for season in seasons:
             Season.objects.get_or_create(season=season["season"],
@@ -36,7 +36,7 @@ class CrawlerView(TemplateView):
             del defaults["data_id"]
             del defaults["categories"]
             del defaults["studios"]
-            title_model, created = Title.objects.update_or_create(data_id=title['data_id'], defaults={**defaults})
+            title_model, created = Anime.objects.update_or_create(data_id=title['data_id'], defaults={**defaults})
 
             if created:
                 self.create_and_fill_category_and_studio(title_model, title)
@@ -55,8 +55,8 @@ class CrawlerView(TemplateView):
 
 
 class SeasonView(ListView):
-    template_name = 'title_list.html'
-    context_object_name = 'titles'
+    template_name = 'season.html'
+    context_object_name = 'anime_list'
     paginate_by = 20
     paginate_orphans = 4
     ordering = '-rating'
@@ -66,17 +66,57 @@ class SeasonView(ListView):
             self.ordering = self.request.GET["order_by"]
 
         season = Season.objects.get(season=self.kwargs['season'], year=self.kwargs['year'])
-        titles = Title.objects.filter(season=season).order_by(self.ordering)
-        if not titles:
-            raise Http404("There are not titles in this season")
-        return titles
+        anime_list = Anime.objects.filter(season=season).order_by(self.ordering)
+        if not anime_list:
+            raise Http404("There are not anime in this season")
+
+        return anime_list
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         seasons = Season.objects.all()
         season = seasons.get(season=self.kwargs['season'], year=self.kwargs['year'])
-        context["head"] = str(season)
+        context["season"] = str(season)
         context["seasons"] = seasons
+
+        page = bool(self.request.GET.get("page"))
+        context["page"] = page
+
+        if self.request.GET.get('order_by'):
+            context["order_by"] = "order_by=" + self.get_ordering() + "&"
+        else:
+            context["order_by"] = ""
+
+        context["choices"] = CHOICES
+        context["ordering"] = self.get_ordering()
+
+        return context
+
+
+class CategoryView(ListView):
+    model = Category
+    template_name = 'anime_list.html'
+    context_object_name = 'anime_list'
+    paginate_by = 20
+    paginate_orphans = 4
+    ordering = '-rating'
+
+    def get_queryset(self):
+        if self.request.GET.get('order_by'):
+            self.ordering = self.request.GET["order_by"]
+
+        category = get_object_or_404(Category, slug=self.kwargs['category'])
+        anime_list = Anime.objects.filter(categories=category).order_by(self.ordering)
+        if not anime_list:
+            raise Http404("There are not anime in this season")
+        return anime_list
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        seasons = Season.objects.all()
+        context["seasons"] = seasons
+        print(self.model)
+        context["head"] = self.kwargs["category"]
 
         page = bool(self.request.GET.get("page"))
         context["page"] = page
@@ -86,60 +126,53 @@ class SeasonView(ListView):
         else:
             context["order_by"] = ""
 
-        choices = [
-            ('rating', 'по рейтингу'),
-            ('title_russian', 'по русскому названию'),
-            ('title_english', 'по английскому названию'),
-            ('title_romaji', 'по японскому названию')
-        ]
-        context["choices"] = choices
+        context["choices"] = CHOICES
         context["ordering"] = self.get_ordering()
 
         return context
 
 
-class CategoryView(ListView):
-    template_name = 'title_list.html'
-    context_object_name = 'titles'
-    paginate_by = 20
-    paginate_orphans = 4
-
-    def get_queryset(self):
-        category = get_object_or_404(Category, slug=self.kwargs['category'])
-        titles = get_list_or_404(Title, categories=category)
-        return titles
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        seasons = Season.objects.all()
-        context["seasons"] = seasons
-        context["head"] = self.kwargs["category"]
-        return context
-
-
 class StudioView(ListView):
-    template_name = 'title_list.html'
-    context_object_name = 'titles'
+    template_name = 'anime_list.html'
+    context_object_name = 'anime_list'
     paginate_by = 20
     paginate_orphans = 4
+    ordering = '-rating'
 
     def get_queryset(self):
+        if self.request.GET.get('order_by'):
+            self.ordering = self.request.GET["order_by"]
+
         studio = get_object_or_404(Studio, slug=self.kwargs['studio'])
-        titles = get_list_or_404(Title, studios=studio)
-        return titles
+        anime_list = Anime.objects.filter(studios=studio).order_by(self.ordering)
+        if not anime_list:
+            raise Http404("There are not anime in this season")
+        return anime_list
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         seasons = Season.objects.all()
         context["seasons"] = seasons
         context["head"] = self.kwargs["studio"]
+
+        page = bool(self.request.GET.get("page"))
+        context["page"] = page
+
+        if self.request.GET.get('order_by'):
+            context["order_by"] = "order_by=" + self.request.GET["order_by"] + "&"
+        else:
+            context["order_by"] = ""
+
+        context["choices"] = CHOICES
+        context["ordering"] = self.get_ordering()
+
         return context
 
 
-class TitleView(DetailView):
-    model = Title
-    context_object_name = 'title'
-    template_name = 'title.html'
+class AnimeView(DetailView):
+    model = Anime
+    context_object_name = 'anime'
+    template_name = 'anime.html'
     pk_url_kwarg = 'data_id'
 
     def get_object(self, queryset=None):
