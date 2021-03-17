@@ -14,4 +14,5 @@ def get_current_season(seasons):
     for season in seasons:
         if season.season_end_date > now > season.season_start_date:
             return season
+    return seasons.last()
 
